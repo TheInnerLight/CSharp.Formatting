@@ -1,0 +1,25 @@
+type project
+title
+    CSharp.Formatting
+owners
+    Phil Curzon
+authors 
+    Phil Curzon
+projectUrl
+    http://github.com/TheInnerLight/CSharp.Formatting
+iconUrl
+    https://raw.githubusercontent.com/TheInnerLight/CSharp.Formatting/master/docs/files/img/logo.png
+licenseUrl
+    http://github.com/TheInnerLight/CSharp.Formatting/blob/master/LICENSE.txt
+requireLicenseAcceptance
+    false
+copyright
+    Copyright 2015
+tags
+    C# csharp F# fsharp formatting documentation
+summary
+    Tools for generating C# web documentation
+description
+    ...
+
+
