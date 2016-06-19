@@ -14,12 +14,26 @@ module String =
     let replace (oldStr : string) (newStr : string) (str : string) =
         str.Replace (oldStr, newStr)
 
+module TypeSymbol =
+    let toDisplayString (typeSymbol : ITypeSymbol) =
+        typeSymbol.ToDisplayString()
+
+type Whitespace =
+    |NormalWS
+    |FixedWS
+
 /// Functions for encoding code elements in HTML
 module HtmlGenerator =
-    /// encode a string as html with fixed whitespacing
-    let htmlEncodeString (str : string) =
+
+    let private encodeWhitespace whitespace str =
+        match whitespace with
+        |NormalWS -> str
+        |FixedWS -> String.replace " " "\xA0" str
+
+    /// encode a string as html with non-fixed whitespacing
+    let htmlEncodeString whitespace (str : string) =
         str
-        |> String.replace " " "\xA0"
+        |> encodeWhitespace whitespace
         |> System.Web.HttpUtility.HtmlEncode
         |> String.replace "\n" "<br/>"
 
@@ -37,54 +51,58 @@ module HtmlGenerator =
 
     /// html encode the string representation of a syntax token
     let htmlEncodeTokenText (token : SyntaxToken) =
-        htmlEncodeString (token.ToString())
+        htmlEncodeString FixedWS (token.ToString())
 
     /// encode a C# keyword as html, grabbing type information if applicable
-    let htmlEncodeKeyword (semanticModel :SemanticModel) (token : SyntaxToken) =
+    let htmlEncodeKeyword syntaxItem =
         let typeInfoStr = 
-            Tokens.findExpressionTypeInfo semanticModel token 
-            |> Option.map (fun ti -> htmlEncodeString <| ti.ToDisplayString())
+            Tokens.findExpressionTypeInfo syntaxItem
+            |> Option.map (htmlEncodeString FixedWS << TypeSymbol.toDisplayString)
         createSpan "keyword" typeInfoStr
 
     /// encode a C# identifier as html, grabbing type information if applicable
-    let htmlEncodeIdentifier (semanticModel :SemanticModel) (token : SyntaxToken) =
+    let htmlEncodeIdentifier syntaxItem =
         let typeInfoStr = 
-            Tokens.findExpressionTypeInfo semanticModel token 
-            |> Option.map (fun ti -> htmlEncodeString <| ti.ToDisplayString())
-        match (token, semanticModel) with
+            Tokens.findExpressionTypeInfo syntaxItem 
+            |> Option.map (htmlEncodeString FixedWS << TypeSymbol.toDisplayString)
+        match syntaxItem with
         |InterfaceIdentifier _ -> createSpan "interfaceIdentifier" typeInfoStr
         |ClassIdentifier _ -> createSpan "classIdentifier" typeInfoStr
         |EnumIdentifier _ -> createSpan "enumIdentifier" typeInfoStr
         |VarIdentifier _ -> createSpan "varIdentifier" typeInfoStr
+        |AttributeIdentifier _ -> createSpan "attribIdentifier" typeInfoStr
         |MethodIdentifier mInfo -> createSpan "methodIdentifier" (Some <| mInfo.ToDisplayString())
-        |LocalVar _ -> createSpan "localVar" (Option.map (fun str -> token.ToString() + " : " + str) typeInfoStr) 
+        |LocalVar _ -> createSpan "localVar" (Option.map (fun str -> syntaxItem.Token.ToString() + " : " + str) typeInfoStr) 
         |_ -> createSpan "other" typeInfoStr
 
     /// encode C# trivia (comments/whitespace etc) as html
     let htmlEncodeTrivia (syntaxTrivia : SyntaxTrivia) =
         let formatFunction = 
             match syntaxTrivia with
-            |SingleLineComment _ -> createSpan "slComment" None
-            |MultiLineComment _ -> createSpan "slComment" None
-            |_ -> sprintf """%s"""
-        formatFunction (htmlEncodeString <| syntaxTrivia.ToFullString())
+            |MultiLineComment _ -> 
+                match syntaxTrivia.ToFullString().StartsWith("/***") with
+                |false -> createSpan "slComment" None << htmlEncodeString FixedWS
+                |true -> createSpan "documentation" None << htmlEncodeString NormalWS
+            |SingleLineComment _ -> createSpan "slComment" None << htmlEncodeString FixedWS
+            |_ -> sprintf """%s""" << htmlEncodeString FixedWS
+        formatFunction (syntaxTrivia.ToFullString())
         
     /// encode an arbitrary C# syntax token as html
-    let htmlEncodeSyntaxToken (semanticModel :SemanticModel) (token : SyntaxToken) =
-        let leadingTrivia = Seq.fold (fun acc st -> acc + htmlEncodeTrivia st) String.empty token.LeadingTrivia
-        let trailingTrivia = Seq.fold (fun acc st -> acc + htmlEncodeTrivia st) String.empty token.TrailingTrivia
+    let htmlEncodeSyntaxToken syntaxItem =
+        let leadingTrivia = Seq.fold (fun acc st -> acc + htmlEncodeTrivia st) String.empty syntaxItem.Token.LeadingTrivia
+        let trailingTrivia = Seq.fold (fun acc st -> acc + htmlEncodeTrivia st) String.empty syntaxItem.Token.TrailingTrivia
         let formatFunction =   
-            match token with
-            |Keyword _ -> htmlEncodeKeyword semanticModel token
-            |Identifier _ -> htmlEncodeIdentifier semanticModel token
+            match syntaxItem with
+            |Keyword _ -> htmlEncodeKeyword syntaxItem
+            |Identifier _ -> htmlEncodeIdentifier syntaxItem
             |StringLiteral _ -> createSpan "literal" None
             |Name _ -> createSpan "test" None
             |_ -> sprintf """%s"""
-        leadingTrivia + formatFunction (htmlEncodeTokenText token) + trailingTrivia
+        leadingTrivia + formatFunction (htmlEncodeTokenText syntaxItem.Token) + trailingTrivia
 
     /// walk a supplied syntax node, encoding all tokens contained as html and concatenate the results
     let htmlEncodeNode (semanticModel :SemanticModel) (node : SyntaxNode)  =
-        (node.DescendantTokens()) |> Seq.fold (fun html node -> html + (htmlEncodeSyntaxToken semanticModel node)) String.empty
+        (node.DescendantTokens()) |> Seq.fold (fun html node -> html + (htmlEncodeSyntaxToken {Token = node; Model = semanticModel})) String.empty
         
     /// Encode some supplied source code as html
     let htmlEncodeSource (source : string) =
