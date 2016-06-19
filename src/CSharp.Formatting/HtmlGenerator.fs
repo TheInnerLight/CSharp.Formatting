@@ -68,6 +68,7 @@ module HtmlGenerator =
         match syntaxItem with
         |InterfaceIdentifier _ -> createSpan "interfaceIdentifier" typeInfoStr
         |ClassIdentifier _ -> createSpan "classIdentifier" typeInfoStr
+        |StructIdentifier _ -> createSpan "structIdentifier" typeInfoStr
         |EnumIdentifier _ -> createSpan "enumIdentifier" typeInfoStr
         |VarIdentifier _ -> createSpan "varIdentifier" typeInfoStr
         |AttributeIdentifier _ -> createSpan "attribIdentifier" typeInfoStr

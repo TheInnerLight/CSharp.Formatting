@@ -81,6 +81,8 @@ module Tokens =
     /// Finds the type information for syntax highlighting purposes, this drills into the type of arrays
     let private tryFindHighlightTypeInfo syntaxItem =
         match findParentKinds syntaxItem.Token with
+        |Some(SyntaxKind.ForEachStatement, _)
+        |Some(SyntaxKind.CatchDeclaration, _)
         |Some(SyntaxKind.SimpleBaseType, _)
         |Some(SyntaxKind.Attribute, _) 
         |Some(SyntaxKind.Parameter, _) 
@@ -96,7 +98,7 @@ module Tokens =
         |_ -> None
         
     /// Seperates type identifiers by identifying whether they are interfaces, classes, enums, vars or something else
-    let (|InterfaceIdentifier|ClassIdentifier|EnumIdentifier|VarIdentifier|AttributeIdentifier|Other|) syntaxItem =
+    let (|InterfaceIdentifier|ClassIdentifier|StructIdentifier|EnumIdentifier|VarIdentifier|AttributeIdentifier|Other|) syntaxItem =
         let identifierTypeInfo = tryFindHighlightTypeInfo syntaxItem
         /// Splits the type infos into appropriate groups, determining whether the type is an interface, a class or an enum
         let splitTypeInfosByTypeGroup (tI : ITypeSymbol)   =
@@ -104,9 +106,10 @@ module Tokens =
             |SyntaxKind.Attribute -> AttributeIdentifier tI
             |_ ->
                 match tI.TypeKind with
-                |TypeKind.Interface | TypeKind.Class | TypeKind.Enum when syntaxItem.Token.ValueText.ToUpperInvariant() = "VAR" ->  VarIdentifier tI
+                |TypeKind.Struct | TypeKind.Interface | TypeKind.Class | TypeKind.Enum when syntaxItem.Token.ValueText.ToUpperInvariant() = "VAR" ->  VarIdentifier tI
                 |TypeKind.Interface -> InterfaceIdentifier tI
                 |TypeKind.Class -> ClassIdentifier tI
+                |TypeKind.Struct -> StructIdentifier tI
                 |TypeKind.Enum -> EnumIdentifier tI
                 |_ -> Other
         // Use other if no other type is valid
