@@ -1,6 +1,10 @@
 # CSharp.Formatting
 Tools for generating syntax highlighted C# documentation (written in F#)
 
+## Project Status
+
+Appveyor: ![Build Status](https://ci.appveyor.com/api/projects/status/github/TheInnerLight/CSharp.Formatting?branch=master&svg=true)
+
 ## Getting started
 
 - Generate a C# script (.csx) file and include some code, e.g.
