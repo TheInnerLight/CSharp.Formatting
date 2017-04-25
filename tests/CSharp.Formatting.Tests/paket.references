@@ -1,4 +1,5 @@
 FSharp.Core
 group Test
-NUnit
-NUnit.Runners
+  FsCheck
+  FsCheck.Xunit
+  xunit.runner.visualstudio
