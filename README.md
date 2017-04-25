@@ -17,6 +17,7 @@ Console.WriteLine("Hello World!");
 C# Example
 
 ```csharp
+using CSharp.Formatting;
 
 var data = System.IO.File.ReadAllText(@"ExampleScript.csx");
 var html = HtmlGenerator.htmlEncodeSource(data);
@@ -26,6 +27,7 @@ System.IO.File.WriteAllText("test.html", html)
 F# example
 
 ```fsharp
+open CSharp.Formatting
 
 let data = System.IO.File.ReadAllText """ExampleScript.csx"""
 let html = HtmlGenerator.htmlEncodeSource data
