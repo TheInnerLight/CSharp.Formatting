@@ -1,8 +1,9 @@
 source https://nuget.org/api/v2
 
 nuget FSharp.Core redirects: force
-nuget Microsoft.CodeAnalysis.CSharp 1.2.2
-nuget Microsoft.CodeAnalysis.CSharp.Scripting 1.2.2
+nuget Microsoft.CodeAnalysis.CSharp ~> 2.1.0 redirects: force
+nuget Microsoft.CodeAnalysis.CSharp.Scripting ~> 2.1.0 redirects: force
+nuget Microsoft.CodeAnalysis.Scripting ~> 2.1.0 redirects: force
 
 group Build
   source https://nuget.org/api/v2
