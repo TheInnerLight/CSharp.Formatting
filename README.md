@@ -50,7 +50,7 @@ System.IO.File.WriteAllText("test.html", html)
 </html>
 ```
 
-The results of the syntax highlighting is controlled by a style sheet called `highlight.css`, here is an example:
+The formatting that the syntax highlighting produces is controlled by a style sheet called `highlight.css`, here is an example:
 
 ```css
 .documentation {
