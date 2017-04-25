@@ -12,7 +12,7 @@ using System;
 Console.WriteLine("Hello World!");
 ```
 
-- Generate html documentation using the script file
+- Generate html documentation using the script file and the `CSharp.Formatting` library.
 
 C# Example
 
