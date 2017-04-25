@@ -13,6 +13,9 @@ module String =
     /// Replace occurences of 'oldStr' with 'newStr' in the supplied string
     let replace (oldStr : string) (newStr : string) (str : string) =
         str.Replace (oldStr, newStr)
+    /// Gets a string without `start` characters from the start and `end'` from the end
+    let withoutStartEnd start end' (str : string) =
+        str.Substring(start, str.Length-start-end')
 
 module TypeSymbol =
     let toDisplayString (typeSymbol : ITypeSymbol) =
@@ -83,10 +86,11 @@ module HtmlGenerator =
             |MultiLineComment _ -> 
                 match syntaxTrivia.ToFullString().StartsWith("/***") with
                 |false -> createSpan "slComment" None << htmlEncodeString FixedWS
-                |true -> createSpan "documentation" None << htmlEncodeString NormalWS
+                |true -> createSpan "documentation" None << htmlEncodeString NormalWS << String.withoutStartEnd 4 2
             |SingleLineComment _ -> createSpan "slComment" None << htmlEncodeString FixedWS
             |_ -> sprintf """%s""" << htmlEncodeString FixedWS
-        formatFunction (syntaxTrivia.ToFullString())
+        let syntaxTrivia = syntaxTrivia.ToFullString()
+        formatFunction syntaxTrivia
         
     /// encode an arbitrary C# syntax token as html
     let htmlEncodeSyntaxToken syntaxItem =

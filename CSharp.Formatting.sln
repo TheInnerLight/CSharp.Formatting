@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{63297B98-5CED-492C-A5B7-A5B4F73CF142}"
 	ProjectSection(SolutionItems) = preProject
@@ -35,6 +35,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{ED8079DD
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "CSharp.Formatting.Tests", "tests\CSharp.Formatting.Tests\CSharp.Formatting.Tests.fsproj", "{D77CBCEE-5F98-4884-A580-669A7FF0C409}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TestApp", "samples\TestApp\TestApp.fsproj", "{4BD699EF-A8B5-4313-B6EF-82399C293BA8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{D77CBCEE-5F98-4884-A580-669A7FF0C409}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D77CBCEE-5F98-4884-A580-669A7FF0C409}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D77CBCEE-5F98-4884-A580-669A7FF0C409}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BD699EF-A8B5-4313-B6EF-82399C293BA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BD699EF-A8B5-4313-B6EF-82399C293BA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BD699EF-A8B5-4313-B6EF-82399C293BA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BD699EF-A8B5-4313-B6EF-82399C293BA8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

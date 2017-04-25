@@ -1,0 +1,60 @@
+.documentation {
+    font-family: Calibri;
+    font-size: 20px;
+}
+
+body {
+    background-color: white;
+    color: black;
+    font-family: Consolas,monaco,monospace;
+    font-size: 15px;
+}
+
+.block {
+    padding-left: 20px;
+}
+
+.keyword {
+    color : blue;
+}
+
+.literal {
+    color : OrangeRed;
+}
+
+.interfaceIdentifier {
+    color : Orange;
+    font-weight: bold;
+}
+
+.classIdentifier {
+    color : DodgerBlue;
+    font-weight: bold;
+}
+
+.structIdentifier {
+    color : DodgerBlue;
+    font-weight: bold;
+}
+
+.enumIdentifier {
+    color : yellow;
+    font-weight: bold;
+}
+
+.varIdentifier {
+    color : blue;
+}
+
+.attribIdentifier {
+    color : DarkViolet;
+    font-weight: bold;
+}
+
+.methodIdentifier {
+
+}
+
+.slComment {
+    color : green;
+}
