@@ -7,7 +7,7 @@ Appveyor: ![Build Status](https://ci.appveyor.com/api/projects/status/github/The
 
 ## Getting started
 
-- Generate a C# script (.csx) file and include some code, e.g.
+__1.__ Generate a C# script (.csx) file and include some code, e.g.
 
 ```csharp
 
@@ -16,7 +16,7 @@ using System;
 Console.WriteLine("Hello World!");
 ```
 
-- Generate html documentation using the script file and the `CSharp.Formatting` library.
+__2.__ Generate html documentation using the script file and the `CSharp.Formatting` library.
 
 C# Example
 
@@ -38,7 +38,7 @@ let html = HtmlGenerator.htmlEncodeSource data
 System.IO.File.WriteAllText("test.html", html)
 ```
 
-- Review the result
+__3.__ Review the result
 
 ```html
 <html>
@@ -53,6 +53,10 @@ System.IO.File.WriteAllText("test.html", html)
   </body>
 </html>
 ```
+
+---
+
+## Details
 
 The formatting that the syntax highlighting produces is controlled by a style sheet called `highlight.css`, here is an example:
 
