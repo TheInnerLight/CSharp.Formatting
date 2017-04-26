@@ -56,7 +56,21 @@ __3.__ Review the result
 
 ---
 
-## Details
+## Usage
+
+Include documentation within your `.csx` script file by using multiline comments of the form `/***` and `*/`:
+
+```csharp
+/***
+This is documentation.
+*/
+
+Console.WriteLine("This is code.");
+```
+
+Standard multiline `/*`, `*/` and single line comments `//` will be higlighted like typical code comments in your IDE.
+
+## Highlighting
 
 The formatting that the syntax highlighting produces is controlled by a style sheet called `highlight.css`, here is an example:
 
@@ -122,3 +136,4 @@ body {
     color : green;
 }
 ```
+
