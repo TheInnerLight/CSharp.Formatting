@@ -101,6 +101,7 @@ module HtmlGenerator =
             |Keyword _ -> htmlEncodeKeyword syntaxItem
             |Identifier _ -> htmlEncodeIdentifier syntaxItem
             |StringLiteral _ -> createSpan "literal" None
+            |CharacterLiteral _ -> createSpan "charLiteral" None
             |Name _ -> createSpan "test" None
             |_ -> sprintf """%s"""
         leadingTrivia + formatFunction (htmlEncodeTokenText syntaxItem.Token) + trailingTrivia

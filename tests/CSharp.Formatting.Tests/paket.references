@@ -1,4 +1,7 @@
 FSharp.Core
+Microsoft.CodeAnalysis.CSharp
+Microsoft.CodeAnalysis.CSharp.Scripting
+Microsoft.CodeAnalysis.Scripting
 group Test
   FsCheck
   FsCheck.Xunit

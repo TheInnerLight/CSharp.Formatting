@@ -22,6 +22,10 @@ body {
     color : OrangeRed;
 }
 
+.charLiteral {
+    color: OrangeRed;
+}
+
 .interfaceIdentifier {
     color : Orange;
     font-weight: bold;

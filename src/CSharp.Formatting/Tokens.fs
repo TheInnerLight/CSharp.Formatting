@@ -22,7 +22,12 @@ module Tokens =
     /// Identifies a string literal
     let (|StringLiteral|_|) item =
         match item.Token.Kind() with
-        |SyntaxKind.StringLiteralToken
+        |SyntaxKind.StringLiteralToken -> Some item
+        |_ -> None
+
+    /// Identifies a character literal
+    let (|CharacterLiteral|_|) item =
+        match item.Token.Kind() with
         |SyntaxKind.CharacterLiteralToken -> Some item
         |_ -> None
 
