@@ -1,7 +1,10 @@
 init:
   - git config --global core.autocrlf input
+environment:
+  nuget_api_key:
+    secure: WpwZK6wLKE757j3K5UKFHM3Hs8tCRXJCr1d2n0GKgIX1u/30y8kXR07q1FGDcJsD
 build_script:
-  - cmd: build.cmd
+  - cmd: build_appveyor.cmd
 test: off
 version: 0.0.1.{build}
 artifacts:
