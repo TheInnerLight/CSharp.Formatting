@@ -79,7 +79,9 @@ let (|Fsproj|Csproj|Vbproj|Shproj|) (projFileName:string) =
     | _                           -> failwith (sprintf "Project file %s not supported. Unknown project type." projFileName)
 
 Target "SetAppVeyorVersion" (fun _ ->
-    AppVeyor.UpdateBuildVersion (release.AssemblyVersion)
+    let buildNum = int <| AppVeyor.AppVeyorEnvironment.BuildNumber
+    let version = sprintf "%d.%d.%d.%d" release.SemVer.Major release.SemVer.Minor release.SemVer.Patch buildNum
+    AppVeyor.UpdateBuildVersion version
 )
 
 // Generate assembly info files with the right version & up-to-date information
