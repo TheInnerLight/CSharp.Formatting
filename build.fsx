@@ -183,18 +183,25 @@ Target "NuGet" (fun _ ->
             ReleaseNotes = toLines release.Notes})
 )
 
+let withoutTracing action =
+    ProcessHelper.enableProcessTracing <- false
+    action()
+    ProcessHelper.enableProcessTracing <- true
+    
+
 Target "PublishNuget" (fun _ ->
     traceLine()
     trace "PublishNuget"
     if AppVeyor.AppVeyorEnvironment.RepoBranch.ToLowerInvariant() = "master" then
         trace "Build is master: Release nuget"
         let apiKey = environVar "nuget_api_key"
-
-        Paket.Push(fun p ->
-            { p with
-                WorkingDir = "bin" 
-                ApiKey = apiKey
-                })
+        // hide the trace
+        withoutTracing (fun _ ->
+            Paket.Push(fun p ->
+                { p with
+                    WorkingDir = "bin" 
+                    ApiKey = apiKey
+                    }))
     else
         trace "Build is not master: Skipping nuget publish"
 )
@@ -233,32 +240,7 @@ let executeFAKEWithOutput workingDirectory script fsiargs envArgs =
 #load "paket-files/build/fsharp/FAKE/modules/Octokit/Octokit.fsx"
 open Octokit
 
-Target "Release" (fun _ ->
-    if AppVeyor.AppVeyorEnvironment.RepoBranch.ToLowerInvariant() = "master" then
-
-        let apiKey = environVar "github_api_key"
-
-        let remote =
-            Git.CommandHelper.getGitResult "" "remote -v"
-            |> Seq.filter (fun (s: string) -> s.EndsWith("(push)"))
-            |> Seq.tryFind (fun (s: string) -> s.Contains(gitOwner + "/" + gitName))
-            |> function None -> gitHome + "/" + gitName | Some (s: string) -> s.Split().[0]
-
-        StageAll ""
-        Git.Commit.Commit "" (sprintf "Bump version to %s" release.NugetVersion)
-        Branches.pushBranch "" remote (Information.getBranchName "")
-
-        Branches.tag "" release.NugetVersion
-        Branches.pushTag "" remote release.NugetVersion
-
-        // release on github
-        createClientWithToken apiKey
-        |> createDraft gitOwner gitName release.NugetVersion (release.SemVer.PreRelease <> None) release.Notes
-        // TODO: |> uploadFile "PATH_TO_FILE"
-        |> releaseDraft
-        |> Async.RunSynchronously
-    
-)
+Target "Release" DoNothing
 
 Target "BuildPackage" DoNothing
 

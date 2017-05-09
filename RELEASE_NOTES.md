@@ -1,3 +1,7 @@
+### 0.2.2 - Build Process Update
+* Hide tracing in nuget deployment
+* Updated FSharp.Core dependency to at least 4.0
+
 ### 0.2.1 - Build Process Update
 * Updates to build automation and deployment
 
