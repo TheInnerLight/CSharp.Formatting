@@ -3,6 +3,8 @@ init:
 environment:
   nuget_api_key:
     secure: WpwZK6wLKE757j3K5UKFHM3Hs8tCRXJCr1d2n0GKgIX1u/30y8kXR07q1FGDcJsD
+  github_api_key:
+    secure: wnPkiwuNOgdfKT+5dVR4A6NNZAWX3VKXwghhbgK0oU6OFdJ5+HryOZMQJABZxtH8
 build_script:
   - cmd: build_appveyor.cmd
 test: off

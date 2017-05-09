@@ -174,6 +174,8 @@ Target "SourceLink" (fun _ ->
 // Build a NuGet package
 
 Target "NuGet" (fun _ ->
+    traceLine()
+    trace "Building nuget package"
     Paket.Pack(fun p ->
         { p with
             OutputPath = "bin"
@@ -182,9 +184,19 @@ Target "NuGet" (fun _ ->
 )
 
 Target "PublishNuget" (fun _ ->
-    Paket.Push(fun p ->
-        { p with
-            WorkingDir = "bin" })
+    traceLine()
+    trace "PublishNuget"
+    if AppVeyor.AppVeyorEnvironment.RepoBranch.ToLowerInvariant() = "master" then
+        trace "Build is master: Release nuget"
+        let apiKey = environVar "nuget_api_key"
+
+        Paket.Push(fun p ->
+            { p with
+                WorkingDir = "bin" 
+                ApiKey = apiKey
+                })
+    else
+        trace "Build is not master: Skipping nuget publish"
 )
 
 
@@ -224,7 +236,7 @@ open Octokit
 Target "Release" (fun _ ->
     if AppVeyor.AppVeyorEnvironment.RepoBranch.ToLowerInvariant() = "master" then
 
-        let apiKey = environVar "nuget_api_key"
+        let apiKey = environVar "github_api_key"
 
         let remote =
             Git.CommandHelper.getGitResult "" "remote -v"
