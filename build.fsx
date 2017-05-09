@@ -270,7 +270,8 @@ Target "All" DoNothing
   ==> "NuGet"
   ==> "BuildPackage"
 
-"BuildPackage"
+"SetAppVeyorVersion"
+  ==> "BuildPackage"
   ==> "PublishNuget"
   ==> "Release"
 
