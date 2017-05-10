@@ -55,6 +55,12 @@ module Tokens =
         |SyntaxKind.MultiLineCommentTrivia -> Some token
         |_ -> None
 
+    /// Identifies a reference directive
+    let (|ReferenceDirective|_|) (token : SyntaxTrivia) =
+        match token.Kind() with
+        |SyntaxKind.ReferenceDirectiveTrivia -> Some token
+        |_ -> None
+
     let private findParentKinds (token : SyntaxToken) =
         maybe {
                 let! parent = Option.ofObj token.Parent
@@ -101,35 +107,38 @@ module Tokens =
         |Some(SyntaxKind.ObjectCreationExpression, SyntaxKind.GenericName)
         |Some(SyntaxKind.ObjectCreationExpression, SyntaxKind.IdentifierName) -> Option.ofObj <| (syntaxItem.Model.GetTypeInfo(syntaxItem.Token.Parent.Parent).Type)
         |_ -> None
-        
+
+    let (|MethodIdentifier|PropertyIdentifier|IdentifierName|NamespaceIdentifier|TypeIdentifier|AttributeIdentifier|) syntaxItem =
+        match findParentKinds syntaxItem.Token with
+        |Some(SyntaxKind.Attribute, SyntaxKind.IdentifierName)           -> AttributeIdentifier (syntaxItem.Token)
+        |Some(SyntaxKind.TypeArgumentList, SyntaxKind.IdentifierName)
+        |Some(SyntaxKind.VariableDeclaration, SyntaxKind.IdentifierName) -> TypeIdentifier (syntaxItem.Token)
+        |Some(_, SyntaxKind.IdentifierName) -> 
+            match Option.ofObj <| syntaxItem.Model.GetSymbolInfo(syntaxItem.Token.Parent).Symbol with
+            |Some symbol ->
+                match symbol with
+                | :? IMethodSymbol as methodSymbol          -> MethodIdentifier methodSymbol
+                | :? IPropertySymbol as propSymbol          -> PropertyIdentifier propSymbol
+                | :? INamespaceSymbol as namespaceSymbol    -> NamespaceIdentifier namespaceSymbol
+                | :? INamedTypeSymbol                       -> TypeIdentifier (syntaxItem.Token)
+                |_ -> IdentifierName (syntaxItem.Token)
+            |None ->
+                IdentifierName (syntaxItem.Token)
+        |_ -> TypeIdentifier (syntaxItem.Token)
+                
+       
     /// Seperates type identifiers by identifying whether they are interfaces, classes, enums, vars or something else
-    let (|InterfaceIdentifier|ClassIdentifier|StructIdentifier|EnumIdentifier|VarIdentifier|AttributeIdentifier|Other|) syntaxItem =
+    let (|InterfaceIdentifier|ClassIdentifier|StructIdentifier|EnumIdentifier|Other|) syntaxItem =
         let identifierTypeInfo = tryFindHighlightTypeInfo syntaxItem
         /// Splits the type infos into appropriate groups, determining whether the type is an interface, a class or an enum
         let splitTypeInfosByTypeGroup (tI : ITypeSymbol)   =
-            match syntaxItem.Token.Parent.Parent.Kind() with
-            |SyntaxKind.Attribute -> AttributeIdentifier tI
-            |_ ->
-                match tI.TypeKind with
-                |TypeKind.Struct | TypeKind.Interface | TypeKind.Class | TypeKind.Enum when syntaxItem.Token.ValueText.ToUpperInvariant() = "VAR" ->  VarIdentifier tI
-                |TypeKind.Interface -> InterfaceIdentifier tI
-                |TypeKind.Class -> ClassIdentifier tI
-                |TypeKind.Struct -> StructIdentifier tI
-                |TypeKind.Enum -> EnumIdentifier tI
-                |_ -> Other
+            match tI.TypeKind with
+            |TypeKind.Interface -> InterfaceIdentifier tI
+            |TypeKind.Class -> ClassIdentifier tI
+            |TypeKind.Struct -> StructIdentifier tI
+            |TypeKind.Enum -> EnumIdentifier tI
+            |_ -> Other
         // Use other if no other type is valid
         Option.fold (fun _ tI -> splitTypeInfosByTypeGroup tI) Other identifierTypeInfo
-
-    /// Identifies a local variable
-    let (|LocalVar|_|) syntaxItem =
-        Option.ofObj <| syntaxItem.Model.GetDeclaredSymbol(syntaxItem.Token.Parent)
-        |> Option.filter (fun tI -> tI.Kind = SymbolKind.Local)
-
-    /// Identifies a method
-    let (|MethodIdentifier|_|) syntaxItem =
-        let symbol =  Option.ofObj <| syntaxItem.Model.GetSymbolInfo(syntaxItem.Token.Parent).Symbol
-        symbol |> Option.bind (function
-            | :? IMethodSymbol as symbol -> Some symbol
-            |_ -> None)
 
 

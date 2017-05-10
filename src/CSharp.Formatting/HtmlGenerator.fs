@@ -69,15 +69,19 @@ module HtmlGenerator =
             Tokens.findExpressionTypeInfo syntaxItem 
             |> Option.map (htmlEncodeString FixedWS << TypeSymbol.toDisplayString)
         match syntaxItem with
-        |InterfaceIdentifier _ -> createSpan "interfaceIdentifier" typeInfoStr
-        |ClassIdentifier _ -> createSpan "classIdentifier" typeInfoStr
-        |StructIdentifier _ -> createSpan "structIdentifier" typeInfoStr
-        |EnumIdentifier _ -> createSpan "enumIdentifier" typeInfoStr
-        |VarIdentifier _ -> createSpan "varIdentifier" typeInfoStr
-        |AttributeIdentifier _ -> createSpan "attribIdentifier" typeInfoStr
         |MethodIdentifier mInfo -> createSpan "methodIdentifier" (Some <| mInfo.ToDisplayString())
-        |LocalVar _ -> createSpan "localVar" (Option.map (fun str -> syntaxItem.Token.ToString() + " : " + str) typeInfoStr) 
-        |_ -> createSpan "other" typeInfoStr
+        |PropertyIdentifier pInfo -> createSpan "propertyIdentifier" (Some <| pInfo.ToDisplayString())
+        |NamespaceIdentifier nInfo -> createSpan "namespaceIdentifier" (Some <| "Namespace: "  + nInfo.ToDisplayString())
+        |AttributeIdentifier _ -> createSpan "attribIdentifier" typeInfoStr
+        |IdentifierName _ -> createSpan "identifierName" (Option.map (fun str -> syntaxItem.Token.ToString() + " : " + str) typeInfoStr) 
+        |TypeIdentifier _ ->
+            match syntaxItem with
+            |InterfaceIdentifier _ -> createSpan "interfaceIdentifier" (typeInfoStr |> Option.map (fun type' -> "Interface: " + type'))
+            |ClassIdentifier _ -> createSpan "classIdentifier" (typeInfoStr |> Option.map (fun type' -> "Class: " + type'))
+            |StructIdentifier _ -> createSpan "structIdentifier" (typeInfoStr |> Option.map (fun type' -> "Struct: " + type'))
+            |EnumIdentifier _ -> createSpan "enumIdentifier" (typeInfoStr |> Option.map (fun type' -> "Enum: " + type'))
+            |_ -> createSpan "other" typeInfoStr
+        
 
     /// encode C# trivia (comments/whitespace etc) as html
     let htmlEncodeTrivia (syntaxTrivia : SyntaxTrivia) =
@@ -88,6 +92,7 @@ module HtmlGenerator =
                 |false -> createSpan "slComment" None << htmlEncodeString FixedWS
                 |true -> createSpan "documentation" None << htmlEncodeString NormalWS << String.withoutStartEnd 4 2
             |SingleLineComment _ -> createSpan "slComment" None << htmlEncodeString FixedWS
+            |ReferenceDirective _ -> fun _ -> ""
             |_ -> sprintf """%s""" << htmlEncodeString FixedWS
         let syntaxTrivia = syntaxTrivia.ToFullString()
         formatFunction syntaxTrivia
@@ -102,7 +107,6 @@ module HtmlGenerator =
             |Identifier _ -> htmlEncodeIdentifier syntaxItem
             |StringLiteral _ -> createSpan "literal" None
             |CharacterLiteral _ -> createSpan "charLiteral" None
-            |Name _ -> createSpan "test" None
             |_ -> sprintf """%s"""
         leadingTrivia + formatFunction (htmlEncodeTokenText syntaxItem.Token) + trailingTrivia
 
@@ -111,6 +115,7 @@ module HtmlGenerator =
         (node.DescendantTokens()) |> Seq.fold (fun html node -> html + (htmlEncodeSyntaxToken {Token = node; Model = semanticModel})) String.empty
         
     /// Encode some supplied source code as html
+    [<CompiledName("HtmlEncodeSource")>]
     let htmlEncodeSource (source : string) =
         let compilation = CSharp.Scripting.CSharpScript.Create(source).GetCompilation()
         let syntaxTree = Seq.head compilation.SyntaxTrees

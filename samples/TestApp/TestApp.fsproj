@@ -67,6 +67,9 @@
     <EmbeddedResource Include="ExampleScript2.csx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="ExampleScript3.csx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <None Include="paket.references" />
   </ItemGroup>
   <ItemGroup>
